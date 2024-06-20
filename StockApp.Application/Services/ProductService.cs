@@ -4,6 +4,7 @@ using StockApp.Application.Interfaces;
 using StockApp.Domain.Entities;
 using StockApp.Domain.Interfaces;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -50,6 +51,12 @@ namespace StockApp.Application.Services
         {
             var productEntity = _mapper.Map<Product>(productDto);
             await _productRepository.Update(productEntity);
+        }
+
+        public async Task<IEnumerable<ProductDTO>> BuscaProdutosComEstoqueBaixo(int limiteEstoque)
+        {
+            var produtos = await _productRepository.GetProducts();
+            return _mapper.Map<IEnumerable<ProductDTO>>(produtos.Where(p => p.Stock <= limiteEstoque));
         }
     }
 }
