@@ -15,5 +15,6 @@ namespace StockApp.Application.Interfaces
         Task Update(ProductDTO productDto);
         Task Remove(int? id);
         Task<IEnumerable<ProductDTO>> BuscaProdutosComEstoqueBaixo(int limiteEstoque);
+        Task AtualizarProdutos(IEnumerable<ProductDTO> produtos);
     }
 }
