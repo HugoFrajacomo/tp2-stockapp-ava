@@ -1,3 +1,4 @@
+using StockApp.Application.Services;
 using StockApp.Domain.Interfaces;
 using StockApp.Infra.Data.Repositories;
 using StockApp.Infra.IoC;
@@ -11,6 +12,8 @@ internal class Program
         // Add services to the container.
         builder.Services.AddControllers();
         builder.Services.AddScoped<IProductRepository, ProductRepository>();
+        builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+        builder.Services.AddScoped<IRecommendationService, RecommendationService>();
         builder.Services.AddInfrastructureAPI(builder.Configuration);
 
         builder.Services.AddControllers();

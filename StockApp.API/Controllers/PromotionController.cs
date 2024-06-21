@@ -7,10 +7,10 @@ namespace StockApp.API.Controllers
 {
     public class PromotionController : ControllerBase
     {
-        private readonly IDiscountService _discountService;
+        private readonly Application.Interfaces.IDiscountService _discountService;
         private readonly IPromotionService _promotionService;
 
-        public PromotionController(IDiscountService discountService, IPromotionService promotionService)
+        public PromotionController(Application.Interfaces.IDiscountService discountService, IPromotionService promotionService)
         {
             _discountService = discountService;
             _promotionService = promotionService;
