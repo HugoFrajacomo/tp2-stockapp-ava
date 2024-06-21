@@ -59,7 +59,7 @@ namespace StockApp.Application.Services
             return _mapper.Map<IEnumerable<ProductDTO>>(produtos.Where(p => p.Stock <= limiteEstoque));
         }
 
-        public async Task BulkUpdateAsync(List<Product> products)
+        public async Task BulkUpdateAsync(List<ProductDTO> products)
         {
             if (GetProducts == null || !products.Any())
             {
