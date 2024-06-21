@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StockApp.Application.DTOs;
 using StockApp.Application.Interfaces;
+using StockApp.Domain.Entities;
+using StockApp.Infra.Data.Repositories;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -86,6 +88,18 @@ namespace StockApp.API.Controllers
                 return NotFound("Products not found");
             }
             return Ok(products);
+        }
+
+        [HttpPut("bulk-update", Name = "BulkUpdateProducts")]
+        public async Task<IActionResult> BulkUpdate([FromBody] List<ProductDTO> products)
+        {
+            if (products == null || !products.Any())
+            {
+                return BadRequest("Products is null or empty");
+            }
+
+            await _productService.BulkUpdateAsync(products);
+            return Ok("Products updated");
         }
     }
 }

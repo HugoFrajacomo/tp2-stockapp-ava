@@ -58,5 +58,26 @@ namespace StockApp.Application.Services
             var produtos = await _productRepository.GetProducts();
             return _mapper.Map<IEnumerable<ProductDTO>>(produtos.Where(p => p.Stock <= limiteEstoque));
         }
+
+        public async Task BulkUpdateAsync(List<Product> products)
+        {
+            if (GetProducts == null || !products.Any())
+            {
+                throw new ArgumentException("Products list empty or null", nameof(products));
+            }
+            foreach (var product in products)
+            {
+                var existingProduct = await _productRepository.GetById(product.Id);
+                if (existingProduct != null)
+                {
+                    existingProduct.Name = product.Name;
+                    existingProduct.Description = product.Description;
+                    existingProduct.Price = product.Price;
+                    existingProduct.Stock = product.Stock;
+                    existingProduct.Image = product.Image;
+                    existingProduct.CategoryId = product.CategoryId;
+                }
+            }
+        }
     }
 }
