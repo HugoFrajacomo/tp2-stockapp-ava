@@ -1,11 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StockApp.Application.DTOs;
 using StockApp.Application.Interfaces;
-using StockApp.Application.Services;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace StockApp.API.Controllers
 {
-    public class ProductsController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;
 
@@ -47,7 +50,7 @@ namespace StockApp.API.Controllers
             return CreatedAtRoute("GetProduct", new { id = product.Id }, product);
         }
 
-        [HttpPut(Name = "Update Product")]
+        [HttpPut("{id:int}", Name = "UpdateProduct")]
         public async Task<ActionResult> Put(int id, [FromBody] ProductDTO product)
         {
             if (id != product.Id)
@@ -62,7 +65,7 @@ namespace StockApp.API.Controllers
             return Ok(product);
         }
 
-        [HttpDelete("{id:int}", Name = "Delete Product")]
+        [HttpDelete("{id:int}", Name = "DeleteProduct")]
         public async Task<ActionResult> Delete(int id)
         {
             var product = await _productService.GetProductById(id);
@@ -85,7 +88,7 @@ namespace StockApp.API.Controllers
             return Ok(products);
         }
 
-        [HttpPut("AtualizarProdutos", Name = "AtualizarProdutos")]
+        [HttpPut("updatebatch", Name = "UpdateProductsBatch")]
         public async Task<ActionResult> AtualizarProdutos([FromBody] IEnumerable<ProductDTO> products)
         {
             if (products == null)
