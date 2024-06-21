@@ -101,5 +101,16 @@ namespace StockApp.API.Controllers
             await _productService.BulkUpdateAsync(products);
             return Ok("Products updated");
         }
+
+        [HttpGet("filter", Name = "FilterProducts")]
+        public async Task<ActionResult<IEnumerable<ProductDTO>>> GetFilteredAsync(string name, decimal? minPrice, decimal? maxPrice)
+        {
+            var products = await _productService.GetFilteredAsync(name, minPrice, maxPrice);
+            if (products == null)
+            {
+                return NotFound("Products not found");
+            }
+            return Ok(products);
+        }
     }
 }

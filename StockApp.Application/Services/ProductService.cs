@@ -79,5 +79,10 @@ namespace StockApp.Application.Services
                 }
             }
         }
+        public async Task<IEnumerable<ProductDTO>> GetFilteredAsync(string name, decimal? minPrice, decimal? maxPrice)
+        {
+            var products = await _productRepository.GetFilteredAsync(name, minPrice, maxPrice);
+            return _mapper.Map<IEnumerable<ProductDTO>>(products);
+        }
     }
 }
