@@ -36,6 +36,9 @@ namespace StockApp.Infra.IoC
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<IPromotionRepository, PromotionRepository>();
+            services.AddScoped<IPromotionService, PromotionService>();
+            services.AddScoped<IApplyDiscountService, ApplyDiscountService>();
 
             services.AddAutoMapper(typeof(DomainToDTOMappingProfile));
 
