@@ -87,16 +87,5 @@ namespace StockApp.API.Controllers
             }
             return Ok(products);
         }
-
-        [HttpPut("updatebatch", Name = "UpdateProductsBatch")]
-        public async Task<ActionResult> AtualizarProdutos([FromBody] IEnumerable<ProductDTO> products)
-        {
-            if (products == null)
-            {
-                return BadRequest("Products is null");
-            }
-            await _productService.AtualizarProdutos(products);
-            return Ok(products);
-        }
     }
 }

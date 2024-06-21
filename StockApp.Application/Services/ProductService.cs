@@ -58,15 +58,5 @@ namespace StockApp.Application.Services
             var produtos = await _productRepository.GetProducts();
             return _mapper.Map<IEnumerable<ProductDTO>>(produtos.Where(p => p.Stock <= limiteEstoque));
         }
-
-        public async Task AtualizarProdutos(IEnumerable<ProductDTO> produtosDto)
-        {
-            var produtosEntity = _mapper.Map<IEnumerable<Product>>(produtosDto);
-
-            foreach (var produto in produtosEntity)
-            {
-                await _productRepository.Update(produto);
-            }
-        }
     }
 }
