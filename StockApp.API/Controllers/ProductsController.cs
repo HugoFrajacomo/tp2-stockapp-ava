@@ -13,10 +13,12 @@ namespace StockApp.API.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;
+        private readonly IProductComparisonService _productComparisonService;
 
-        public ProductsController(IProductService productService)
+        public ProductsController(IProductService productService, IProductComparisonService productComparisonService)
         {
             _productService = productService;
+            _productComparisonService = productComparisonService;
         }
 
         [HttpGet(Name = "GetProducts")]
@@ -110,6 +112,13 @@ namespace StockApp.API.Controllers
             {
                 return NotFound("Products not found");
             }
+            return Ok(products);
+        }
+
+        [HttpPost("compare")]
+        public async Task<ActionResult<IEnumerable<ProductDTO>>> CompareProducts([FromBody] List<int> productIds)
+        {
+            var products = await _productComparisonService.CompareProductsAsync(productIds);
             return Ok(products);
         }
     }
