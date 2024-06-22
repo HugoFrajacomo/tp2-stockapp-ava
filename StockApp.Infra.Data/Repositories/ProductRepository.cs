@@ -2,12 +2,16 @@
 using StockApp.Domain.Interfaces;
 using StockApp.Infra.Data.Context;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace StockApp.Infra.Data.Repositories
 {
     public class ProductRepository : IProductRepository
     {
-        ApplicationDbContext _productContext;
+        private readonly ApplicationDbContext _productContext;
+
         public ProductRepository(ApplicationDbContext context)
         {
             _productContext = context;
@@ -64,6 +68,11 @@ namespace StockApp.Infra.Data.Repositories
             }
 
             return await query.ToListAsync();
+        }
+
+        public async Task<IEnumerable<Product>> GetByIdsAsync(IEnumerable<int> ids)
+        {
+            return await _productContext.Products.Where(p => ids.Contains(p.Id)).ToListAsync();
         }
     }
 }
