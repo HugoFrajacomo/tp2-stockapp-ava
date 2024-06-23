@@ -2,6 +2,8 @@ using StockApp.Application.Services;
 using StockApp.Domain.Interfaces;
 using StockApp.Infra.Data.Repositories;
 using StockApp.Infra.IoC;
+using Microsoft.Extensions.Caching.StackExchangeRedis; // Adicione esta linha
+using Microsoft.Extensions.Caching.Distributed; // Esta linha também pode ser necessária
 
 internal class Program
 {
@@ -18,6 +20,12 @@ internal class Program
         builder.Services.AddInfrastructureJWT(builder.Configuration);
         builder.Services.AddInfrastructureSwagger();
 
+        // Configura o cache Redis
+        builder.Services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = builder.Configuration.GetConnectionString("Redis");
+        });
+
         builder.Services.AddControllers();
 
         builder.Services.AddEndpointsApiExplorer();
@@ -27,9 +35,9 @@ internal class Program
         {
             options.AddPolicy("AllowAll", builder =>
             {
-                builder.AllowAnyOrigin()    
-                       .AllowAnyMethod()    
-                       .AllowAnyHeader();   
+                builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader();
             });
         });
 
