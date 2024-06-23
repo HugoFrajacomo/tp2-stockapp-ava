@@ -3,19 +3,16 @@ using StockApp.Application.DTOs;
 using StockApp.Application.Interfaces;
 using StockApp.Domain.Entities;
 using StockApp.Domain.Interfaces;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace StockApp.Application.Services
 {
     public class ProductService : IProductService
     {
-        private IProductRepository _productRepository;
-        private IMapper _mapper;
+        private readonly IProductRepository _productRepository;
+        private readonly IMapper _mapper;
 
         public ProductService(IProductRepository productRepository, IMapper mapper)
         {
@@ -23,66 +20,56 @@ namespace StockApp.Application.Services
             _mapper = mapper;
         }
 
-        public async Task Add(ProductDTO productDto)
-        {
-            var productEntity = _mapper.Map<Product>(productDto);
-            await _productRepository.Create(productEntity);
-        }
-
         public async Task<IEnumerable<ProductDTO>> GetProducts()
         {
-            var productsEntity = await _productRepository.GetProducts();
-            return _mapper.Map<IEnumerable<ProductDTO>>(productsEntity);
+            var products = await _productRepository.GetProducts();
+            return _mapper.Map<IEnumerable<ProductDTO>>(products);
         }
 
         public async Task<ProductDTO> GetProductById(int? id)
         {
-            var productEntity = _productRepository.GetById(id);
-            return _mapper.Map<ProductDTO>(productEntity);
+            var product = await _productRepository.GetById(id);
+            return _mapper.Map<ProductDTO>(product);
         }
 
-        public async Task Remove(int? id)
+        public async Task Add(ProductDTO productDto)
         {
-            var productEntity = _productRepository.GetById(id).Result;
-            await _productRepository.Remove(productEntity);
+            var product = _mapper.Map<Product>(productDto);
+            await _productRepository.Create(product);
         }
 
         public async Task Update(ProductDTO productDto)
         {
-            var productEntity = _mapper.Map<Product>(productDto);
-            await _productRepository.Update(productEntity);
+            var product = _mapper.Map<Product>(productDto);
+            await _productRepository.Update(product);
         }
 
-        public async Task<IEnumerable<ProductDTO>> BuscaProdutosComEstoqueBaixo(int limiteEstoque)
+        public async Task Remove(int? id)
         {
-            var produtos = await _productRepository.GetProducts();
-            return _mapper.Map<IEnumerable<ProductDTO>>(produtos.Where(p => p.Stock <= limiteEstoque));
+            var product = await _productRepository.GetById(id);
+            await _productRepository.Remove(product);
         }
 
-        public async Task BulkUpdateAsync(List<ProductDTO> products)
-        {
-            if (GetProducts == null || !products.Any())
-            {
-                throw new ArgumentException("Products list empty or null", nameof(products));
-            }
-            foreach (var product in products)
-            {
-                var existingProduct = await _productRepository.GetById(product.Id);
-                if (existingProduct != null)
-                {
-                    existingProduct.Name = product.Name;
-                    existingProduct.Description = product.Description;
-                    existingProduct.Price = product.Price;
-                    existingProduct.Stock = product.Stock;
-                    existingProduct.Image = product.Image;
-                    existingProduct.CategoryId = product.CategoryId;
-                }
-            }
-        }
         public async Task<IEnumerable<ProductDTO>> GetFilteredAsync(string name, decimal? minPrice, decimal? maxPrice)
         {
             var products = await _productRepository.GetFilteredAsync(name, minPrice, maxPrice);
             return _mapper.Map<IEnumerable<ProductDTO>>(products);
+        }
+
+        public async Task BulkUpdateAsync(IEnumerable<ProductDTO> products)
+        {
+            foreach (var productDto in products)
+            {
+                var product = _mapper.Map<Product>(productDto);
+                await _productRepository.Update(product);
+            }
+        }
+
+        public async Task<IEnumerable<ProductDTO>> BuscaProdutosComEstoqueBaixo(int limiteEstoque)
+        {
+            var products = await _productRepository.GetProducts();
+            var lowStockProducts = products.Where(p => p.Stock < limiteEstoque);
+            return _mapper.Map<IEnumerable<ProductDTO>>(lowStockProducts);
         }
     }
 }

@@ -13,7 +13,7 @@ namespace StockApp.Domain.Interfaces
         Task<Product> Remove(Product product);
         Task<IEnumerable<Product>> GetFilteredAsync(string name, decimal? minPrice, decimal? maxPrice);
         Task<IEnumerable<Product>> GetByIdsAsync(IEnumerable<int> ids);
-        Task<int> GetStockAsync(int productId); // Adiciona método para obter o estoque de um produto
-        Task UpdateStockAsync(int productId, int newStock); // Adiciona método para atualizar o estoque de um produto
+        Task<int> GetStockAsync(int productId);
+        Task UpdateStockAsync(int productId, int newStock);
     }
 }

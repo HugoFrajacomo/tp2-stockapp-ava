@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StockApp.Application.DTOs;
 using StockApp.Application.Interfaces;
-using StockApp.Domain.Entities;
-using StockApp.Infra.Data.Repositories;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace StockApp.API.Controllers
@@ -120,6 +120,26 @@ namespace StockApp.API.Controllers
         {
             var products = await _productComparisonService.CompareProductsAsync(productIds);
             return Ok(products);
+        }
+
+        [HttpGet("export")]
+        public async Task<IActionResult> ExportToCsv()
+        {
+            var products = await _productService.GetProducts();
+            if (products == null || !products.Any())
+            {
+                return NotFound("No products available to export.");
+            }
+
+            var csv = new StringBuilder();
+            csv.AppendLine("Id,Name,Description,Price,Stock");
+
+            foreach (var product in products)
+            {
+                csv.AppendLine($"{product.Id},{product.Name},{product.Description},{product.Price},{product.Stock}");
+            }
+
+            return File(Encoding.UTF8.GetBytes(csv.ToString()), "text/csv", "products.csv");
         }
     }
 }
