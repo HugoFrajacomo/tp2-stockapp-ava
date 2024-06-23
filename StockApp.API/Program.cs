@@ -39,6 +39,13 @@ internal class Program
             });
         });
 
+        builder.Services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = builder.Configuration.GetConnectionString("Redis");
+        });
+
+        builder.Services.AddControllers();
+
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
@@ -52,10 +59,15 @@ internal class Program
 
         app.UseCors("AllowAll");
 
+        app.UseRouting();
+
+        app.UseAuthentication();
+
         app.UseAuthorization();
 
         app.MapControllers();
 
         app.Run();
+
     }
 }
