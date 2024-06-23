@@ -74,5 +74,21 @@ namespace StockApp.Infra.Data.Repositories
         {
             return await _productContext.Products.Where(p => ids.Contains(p.Id)).ToListAsync();
         }
+
+        public async Task<int> GetStockAsync(int productId)
+        {
+            var product = await _productContext.Products.FindAsync(productId);
+            return product != null ? product.Stock : 0;
+        }
+
+        public async Task UpdateStockAsync(int productId, int newStock)
+        {
+            var product = await _productContext.Products.FindAsync(productId);
+            if (product != null)
+            {
+                product.Stock = newStock;
+                await _productContext.SaveChangesAsync();
+            }
+        }
     }
 }
