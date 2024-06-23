@@ -1,12 +1,10 @@
-﻿using StockApp.Infra.Data.Context;
-using StockApp.Domain.Entities;
-using System;
+﻿using StockApp.Domain.Entities;
+using StockApp.Domain.Interfaces;
+using StockApp.Infra.Data.Context;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using StockApp.Domain.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace StockApp.Infra.Data.Repositories
 {
@@ -24,6 +22,15 @@ namespace StockApp.Infra.Data.Repositories
             return await _context.Orders
                 .Include(o => o.Products)
                 .Where(order => order.UserId == userId)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Order>> GetRecentOrdersAsync()
+        {
+            return await _context.Orders
+                .Include(o => o.Products)
+                .OrderByDescending(o => o.OrderDate)
+                .Take(10) 
                 .ToListAsync();
         }
     }

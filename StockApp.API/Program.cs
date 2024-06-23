@@ -1,9 +1,9 @@
+using Microsoft.Extensions.DependencyInjection;
+using StockApp.Application.Interfaces;
 using StockApp.Application.Services;
 using StockApp.Domain.Interfaces;
 using StockApp.Infra.Data.Repositories;
 using StockApp.Infra.IoC;
-using Microsoft.Extensions.Caching.StackExchangeRedis; // Adicione esta linha
-using Microsoft.Extensions.Caching.Distributed; // Esta linha também pode ser necessária
 
 internal class Program
 {
@@ -16,17 +16,15 @@ internal class Program
         builder.Services.AddScoped<IProductRepository, ProductRepository>();
         builder.Services.AddScoped<IOrderRepository, OrderRepository>();
         builder.Services.AddScoped<IRecommendationService, RecommendationService>();
+        builder.Services.AddScoped<IJustInTimeInventoryService, JustInTimeInventoryService>(); // Adiciona o serviço just-in-time
         builder.Services.AddInfrastructureAPI(builder.Configuration);
         builder.Services.AddInfrastructureJWT(builder.Configuration);
         builder.Services.AddInfrastructureSwagger();
 
-        // Configura o cache Redis
         builder.Services.AddStackExchangeRedisCache(options =>
         {
             options.Configuration = builder.Configuration.GetConnectionString("Redis");
         });
-
-        builder.Services.AddControllers();
 
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
