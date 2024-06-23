@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using StockApp.Application.DTOs;
 using StockApp.Domain.Entities;
 using StockApp.Domain.Interfaces;
@@ -14,6 +15,14 @@ namespace StockApp.API.Controllers
         public UsersController(IUserRepository userRepository)
         {
             _userRepository = userRepository;
+        }
+
+        private readonly ILogger<UsersController> _logger;
+
+        public UsersController(IUserRepository userRepository, ILogger<UsersController> logger)
+        {
+            _userRepository = userRepository;
+            _logger = logger;
         }
 
         [HttpPost("register")]
@@ -38,6 +47,32 @@ namespace StockApp.API.Controllers
 
             return Ok("User registered successfully");
         }
+
+        [Authorize(Roles = "AdminRole")]
+        [HttpPost("register-admin")]
+        public async Task<IActionResult> RegisterAdmin([FromBody] UserRegisterDTO userRegisterDTO)
+        {
+            if (userRegisterDTO == null || string.IsNullOrEmpty(userRegisterDTO.UserName) || string.IsNullOrEmpty(userRegisterDTO.Password))
+            {
+                _logger.LogError("Invalid user data recived");
+                return BadRequest("Invalid user data");
+            }
+
+            var user = new User
+            {
+                Username = userRegisterDTO.UserName,
+                PasswordHash = System.Text.Encoding.UTF8.GetBytes(userRegisterDTO.Password),
+                Role = userRegisterDTO.Role
+            };
+
+            await _userRepository.AddAsync(user);
+
+            _logger.LogInformation("Admin user registered successfully");
+
+            return Ok();
+        }
     }
 }
+
+
 
