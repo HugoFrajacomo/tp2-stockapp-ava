@@ -4,70 +4,90 @@ using StockApp.Application.Services;
 using StockApp.Domain.Interfaces;
 using StockApp.Infra.Data.Repositories;
 using StockApp.Infra.IoC;
+using Serilog; 
 
 internal class Program
 {
     private static void Main(string[] args)
     {
-        var builder = WebApplication.CreateBuilder(args);
+        Log.Logger = new LoggerConfiguration()
+            .WriteTo.Console()
+            .CreateLogger();
 
-        // Add services to the container.
-        builder.Services.AddControllers();
-        builder.Services.AddScoped<IProductRepository, ProductRepository>();
-        builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-        builder.Services.AddScoped<IRecommendationService, RecommendationService>();
-        builder.Services.AddScoped<IJustInTimeInventoryService, JustInTimeInventoryService>(); // Adiciona o serviço just-in-time
-        builder.Services.AddInfrastructureAPI(builder.Configuration);
-        builder.Services.AddInfrastructureJWT(builder.Configuration);
-        builder.Services.AddInfrastructureSwagger();
-
-        builder.Services.AddStackExchangeRedisCache(options =>
+        try
         {
-            options.Configuration = builder.Configuration.GetConnectionString("Redis");
-        });
+            Log.Information("Starting up the application");
+            var builder = WebApplication.CreateBuilder(args);
 
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+            builder.Host.UseSerilog();
 
-        builder.Services.AddCors(options =>
-        {
-            options.AddPolicy("AllowAll", builder =>
+            // Add services to the container.
+            builder.Services.AddControllers();
+            builder.Services.AddScoped<IProductRepository, ProductRepository>();
+            builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+            builder.Services.AddScoped<IRecommendationService, RecommendationService>();
+            builder.Services.AddScoped<IJustInTimeInventoryService, JustInTimeInventoryService>(); // Adiciona o serviço just-in-time
+            builder.Services.AddInfrastructureAPI(builder.Configuration);
+            builder.Services.AddInfrastructureJWT(builder.Configuration);
+            builder.Services.AddInfrastructureSwagger();
+
+            builder.Services.AddStackExchangeRedisCache(options =>
             {
-                builder.AllowAnyOrigin()
-                       .AllowAnyMethod()
-                       .AllowAnyHeader();
+                options.Configuration = builder.Configuration.GetConnectionString("Redis");
             });
-        });
 
-        builder.Services.AddStackExchangeRedisCache(options =>
-        {
-            options.Configuration = builder.Configuration.GetConnectionString("Redis");
-        });
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
 
-        builder.Services.AddControllers();
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                           .AllowAnyMethod()
+                           .AllowAnyHeader();
+                });
+            });
 
-        var app = builder.Build();
+            builder.Services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = builder.Configuration.GetConnectionString("Redis");
+            });
 
-        // Configure the HTTP request pipeline.
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI();
+            builder.Services.AddControllers();
+
+            var app = builder.Build();
+
+            // Configure the HTTP request pipeline.
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI();
+            }
+
+            app.UseSerilogRequestLogging(); // Add Serilog request logging
+
+            app.UseHttpsRedirection();
+
+            app.UseCors("AllowAll");
+
+            app.UseRouting();
+
+            app.UseAuthentication();
+
+            app.UseAuthorization();
+
+            app.MapControllers();
+
+            app.Run();
         }
-
-        app.UseHttpsRedirection();
-
-        app.UseCors("AllowAll");
-
-        app.UseRouting();
-
-        app.UseAuthentication();
-
-        app.UseAuthorization();
-
-        app.MapControllers();
-
-        app.Run();
-
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "Application start-up failed");
+        }
+        finally
+        {
+            Log.CloseAndFlush();
+        }
     }
 }
