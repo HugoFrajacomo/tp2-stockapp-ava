@@ -15,6 +15,7 @@ internal class Program
         builder.Services.AddScoped<IOrderRepository, OrderRepository>();
         builder.Services.AddScoped<IRecommendationService, RecommendationService>();
         builder.Services.AddInfrastructureAPI(builder.Configuration);
+        builder.Services.AddInfrastructureJWT(builder.Configuration);
 
         builder.Services.AddControllers();
 
