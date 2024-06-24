@@ -90,5 +90,15 @@ namespace StockApp.Infra.Data.Repositories
                 await _productContext.SaveChangesAsync();
             }
         }
+
+        public Task<IEnumerable<object>> GetLowStockAsync(int threshold)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task UpdateAsync(object product)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
