@@ -49,6 +49,9 @@ internal class Program
                 });
             });
 
+            builder.Services.AddControllers();
+            builder.Services.AddSingleton<ICustomerRelationshipManagementService, CustomerRelationshipManagementService>();
+
             builder.Services.AddStackExchangeRedisCache(options =>
             {
                 options.Configuration = builder.Configuration.GetConnectionString("Redis");
